@@ -4,9 +4,11 @@ Based on GAMES101 Assignment7
 
 ### Goal
 
-:white_check_mark: ​Path Tracing 
+:white_check_mark: Path Tracing 
 
-:white_check_mark:  Thread pool Acceleration using std::thread
+:white_check_mark: BVH Tree Acceleration
+
+:white_check_mark: Thread pool Acceleration using std::thread
 
 :white_check_mark: Microfacet Material
 
@@ -23,6 +25,10 @@ or directly see my blog
 [Uniformly Sample on a Manifold - 1.Rationale | TaKeTube](https://taketube.github.io/2021/05/30/uniformly-sample-on-manifold-1.html)
 
 [Uniformly Sample on a Manifold - 2.Examples | TaKeTube](https://taketube.github.io/2021/05/30/uniformly-sample-on-manifold-2.html)
+
+Some tricks for acceleration (written in my sophomore year, may seem natural or simple now)
+
+https://github.com/TaKeTube/Cornell-Box/blob/main/notes/notes.md 
 
 ### Results (partially)
 
