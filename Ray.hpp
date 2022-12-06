@@ -1,5 +1,4 @@
-#ifndef RAYTRACING_RAY_H
-#define RAYTRACING_RAY_H
+#pragma once
 #include "Vector.hpp"
 struct Ray{
     //Destination = origin + t*direction
@@ -22,4 +21,3 @@ struct Ray{
         return os;
     }
 };
-#endif //RAYTRACING_RAY_H

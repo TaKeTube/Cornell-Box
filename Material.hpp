@@ -1,6 +1,4 @@
-#ifndef RAYTRACING_MATERIAL_H
-#define RAYTRACING_MATERIAL_H
-
+#pragma once
 #include "Vector.hpp"
 
 enum MaterialType {DIFFUSE, MICROFACET};
@@ -149,6 +147,14 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
             return toWorld(localRay, N);
         }
+        default:
+        {
+            float x_1 = get_random_float(), x_2 = get_random_float();
+            float z = std::fabs(1.0f - 2.0f * x_1);
+            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
+            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
+            return toWorld(localRay, N);
+        }
     }
 }
 
@@ -164,6 +170,14 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
             break;
         }
         case MICROFACET:
+        {
+            if (dotProduct(wo, N) > 0.0f)
+                return 0.5f / M_PI;
+            else
+                return 0.0f;
+            break;
+        }
+        default:
         {
             if (dotProduct(wo, N) > 0.0f)
                 return 0.5f / M_PI;
@@ -213,9 +227,17 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             float ks = 0.1f;
             return ks*lambert + (1-ks)*cook_torrance;
         }
+        default:
+        {
+            // calculate the contribution of diffuse   model
+            float cosalpha = dotProduct(N, wo);
+            if (cosalpha > 0.0f) {
+                Vector3f diffuse = Kd / M_PI;
+                return diffuse;
+            }
+            else
+                return Vector3f(0.0f);
+            break;
+        }
     }
 }
-
-
-
-#endif //RAYTRACING_MATERIAL_H

@@ -1,5 +1,4 @@
-#ifndef RAYTRACING_SPHERE_H
-#define RAYTRACING_SPHERE_H
+#pragma once
 
 #include "Object.hpp"
 #include "Vector.hpp"
@@ -66,9 +65,6 @@ public:
     void getSurfaceProperties(const Vector3f &P, const Vector3f &I, const uint32_t &index, const Vector2f &uv, Vector3f &N, Vector2f &st) const
     { N = normalize(P - center); }
 
-    Vector3f evalDiffuseColor(const Vector2f &st)const {
-        //return m->getColor();
-    }
     Bounds3 getBounds(){
         return Bounds3(Vector3f(center.x-radius, center.y-radius, center.z-radius),
                        Vector3f(center.x+radius, center.y+radius, center.z+radius));
@@ -88,8 +84,3 @@ public:
         return m->hasEmission();
     }
 };
-
-
-
-
-#endif //RAYTRACING_SPHERE_H

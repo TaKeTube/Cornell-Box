@@ -1,5 +1,4 @@
-#ifndef RAYTRACING_BOUNDS3_H
-#define RAYTRACING_BOUNDS3_H
+#pragma once
 #include "Ray.hpp"
 #include "Vector.hpp"
 #include <limits>
@@ -146,5 +145,3 @@ inline Bounds3 Union(const Bounds3& b, const Vector3f& p)
     ret.pMax = Vector3f::Max(b.pMax, p);
     return ret;
 }
-
-#endif // RAYTRACING_BOUNDS3_H

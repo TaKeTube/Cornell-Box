@@ -1,6 +1,4 @@
-#ifndef RAYTRACING_BVH_H
-#define RAYTRACING_BVH_H
-
+#pragma once
 #include <atomic>
 #include <vector>
 #include <memory>
@@ -61,8 +59,3 @@ public:
         object = nullptr;
     }
 };
-
-
-
-
-#endif //RAYTRACING_BVH_H
