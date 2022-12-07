@@ -4,15 +4,9 @@
 
 #include "ThreadPool.hpp"
 
-
-inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
-
-// const float EPSILON = 0.00001;
-const float EPSILON = 0.0001;
-
 // The main render function. This where we iterate over all pixels in the image,
 // generate primary rays and cast these rays into the scene. The content of the
-// framebuffer is saved to a file.
+// frame buffer is saved to a file.
 void Renderer::Render(const Scene& scene)
 {
     std::vector<Vector3f> framebuffer(scene.width * scene.height);
@@ -22,7 +16,7 @@ void Renderer::Render(const Scene& scene)
     Vector3f eye_pos(278, 273, -800);
     int m = 0;
 
-    // change the spp value to change sample ammount
+    // change the spp value to change sample amount
     int spp = 4096;
     std::cout << "SPP: " << spp << "\n";
     for (uint32_t j = 0; j < scene.height; ++j) {
@@ -56,7 +50,7 @@ void Renderer::Render(const Scene& scene)
     }
     UpdateProgress(1.f);
 
-    // save framebuffer to file
+    // save frame buffer to file
     FILE* fp = fopen("binary.ppm", "wb");
     (void)fprintf(fp, "P6\n%d %d\n255\n", scene.width, scene.height);
     for (auto i = 0; i < scene.height * scene.width; ++i) {

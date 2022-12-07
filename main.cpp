@@ -51,16 +51,16 @@ int main(int argc, char** argv)
     water->F0 = Vector3f(0.15f,0.15f,0.15f);
     water->alpha = 0.1f;
 
-    MeshTriangle floor("../models/cornellbox/floor.obj", white);
-    // MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white);
-    // MeshTriangle tallbox("../models/cornellbox/tallbox.obj", white);
-    MeshTriangle left("../models/cornellbox/left.obj", red);
-    MeshTriangle right("../models/cornellbox/right.obj", green);
-    MeshTriangle light_("../models/cornellbox/light.obj", light);
+    Mesh floor("../models/cornellbox/floor.obj", white);
+    // Mesh shortbox("../models/cornellbox/shortbox.obj", white);
+    // Mesh tallbox("../models/cornellbox/tallbox.obj", white);
+    Mesh left("../models/cornellbox/left.obj", red);
+    Mesh right("../models/cornellbox/right.obj", green);
+    Mesh light_("../models/cornellbox/light.obj", light);
 
-    MeshTriangle bunny("../models/bunny/bunny2.obj", gold);
-    // MeshTriangle shortbox("../models/cornellbox/shortbox.obj", plastic);
-    // MeshTriangle tallbox("../models/cornellbox/tallbox.obj", gold);
+    Mesh bunny("../models/bunny/bunny2.obj", gold);
+    // Mesh shortbox("../models/cornellbox/shortbox.obj", plastic);
+    // Mesh tallbox("../models/cornellbox/tallbox.obj", gold);
 
     scene.Add(&floor);
     // scene.Add(&shortbox);

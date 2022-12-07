@@ -10,6 +10,8 @@ extern const float  EPSILON;
 extern thread_local std::mt19937 rng;
 const float kInfinity = std::numeric_limits<float>::max();
 
+inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
+
 inline float clamp(const float &lo, const float &hi, const float &v)
 { return std::max(lo, std::min(hi, v)); }
 

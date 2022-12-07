@@ -13,15 +13,10 @@ private:
     }
 
     // Compute refraction direction using Snell's law
-    //
     // We need to handle with care the two possible situations:
-    //
     //    - When the ray is inside the object
-    //
     //    - When the ray is outside.
-    //
     // If the ray is outside, you need to make cosi positive cosi = -N.I
-    //
     // If the ray is inside, you need to invert the refractive indices and negate the normal N
     Vector3f refract(const Vector3f &I, const Vector3f &N, const float &ior) const
     {
@@ -35,13 +30,9 @@ private:
     }
 
     // Compute Fresnel equation
-    //
     // \param I is the incident view direction
-    //
     // \param N is the normal at the intersection point
-    //
     // \param ior is the material refractive index
-    //
     // \param[out] kr is the amount of light reflected
     void fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr) const
     {
@@ -86,12 +77,11 @@ public:
     //Vector3f m_color;
     Vector3f m_emission;
     float ior;
-    float alpha; // roughness
-    Vector3f rho; // intrinsic color
+    float alpha;    // roughness
+    Vector3f rho;   // intrinsic color
     Vector3f Kd, Ks;
     Vector3f F0;
     float specularExponent;
-    //Texture tex;
 
     inline Material(MaterialType t=DIFFUSE, Vector3f e=Vector3f(0,0,0));
     inline MaterialType getType();
@@ -192,7 +182,7 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
     switch(m_type){
         case DIFFUSE:
         {
-            // calculate the contribution of diffuse   model
+            // calculate the contribution of diffuse model
             float cosalpha = dotProduct(N, wo);
             if (cosalpha > 0.0f) {
                 Vector3f diffuse = Kd / M_PI;
@@ -229,7 +219,7 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
         }
         default:
         {
-            // calculate the contribution of diffuse   model
+            // calculate the contribution of diffuse model
             float cosalpha = dotProduct(N, wo);
             if (cosalpha > 0.0f) {
                 Vector3f diffuse = Kd / M_PI;
