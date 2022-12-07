@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <random>
+#include "Vector.hpp"
 
 #undef M_PI
 #define M_PI 3.141592653589793f
@@ -14,6 +15,9 @@ inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
 
 inline float clamp(const float &lo, const float &hi, const float &v)
 { return std::max(lo, std::min(hi, v)); }
+
+inline Vector3f clamp(const float &lo, const float &hi, const Vector3f &v)
+{ return v.Max(Vector3f(lo), v.Min(Vector3f(hi), v)); }
 
 inline bool solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1)
 {

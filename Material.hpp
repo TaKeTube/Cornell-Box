@@ -2,6 +2,7 @@
 #include "Vector.hpp"
 
 enum MaterialType {DIFFUSE, MICROFACET};
+enum SamplingType {UNIFORM, IS_COSWEIGHTED, IS_BRDF};
 
 class Material{
 private:
@@ -74,24 +75,23 @@ private:
 
 public:
     MaterialType m_type;
-    //Vector3f m_color;
+    SamplingType m_sample;
     Vector3f m_emission;
     float ior;
     float alpha;    // roughness
+    float ks;
     Vector3f rho;   // intrinsic color
     Vector3f Kd, Ks;
     Vector3f F0;
     float specularExponent;
 
-    inline Material(MaterialType t=DIFFUSE, Vector3f e=Vector3f(0,0,0));
+    inline Material(MaterialType t=DIFFUSE, Vector3f e=Vector3f(0,0,0), SamplingType s=UNIFORM);
     inline MaterialType getType();
-    //inline Vector3f getColor();
-    inline Vector3f getColorAt(double u, double v);
     inline Vector3f getEmission();
     inline bool hasEmission();
 
     // sample a ray by Material properties
-    inline Vector3f sample(const Vector3f &wi, const Vector3f &N);
+    inline Vector3f sample(const Vector3f &wo, const Vector3f &N);
     // given a ray, calculate the PdF of this ray
     inline float pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N);
     // given a ray, calculate the contribution of this ray
@@ -99,28 +99,22 @@ public:
 
 };
 
-Material::Material(MaterialType t, Vector3f e){
+Material::Material(MaterialType t, Vector3f e, SamplingType s){
     m_type = t;
-    //m_color = c;
+    m_sample = s;
     m_emission = e;
 }
 
 MaterialType Material::getType(){return m_type;}
-///Vector3f Material::getColor(){return m_color;}
 Vector3f Material::getEmission() {return m_emission;}
 bool Material::hasEmission() {
     if (m_emission.norm() > EPSILON) return true;
     else return false;
 }
 
-Vector3f Material::getColorAt(double u, double v) {
-    return Vector3f();
-}
-
-
-Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
-    switch(m_type){
-        case DIFFUSE:
+Vector3f Material::sample(const Vector3f &wo, const Vector3f &N){
+    switch(m_sample){
+        case UNIFORM:
         {
             // uniform sample on the hemisphere
             float x_1 = get_random_float(), x_2 = get_random_float();
@@ -129,13 +123,24 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
             return toWorld(localRay, N);
         }
-        case MICROFACET:
+        case IS_COSWEIGHTED:
         {
             float x_1 = get_random_float(), x_2 = get_random_float();
-            float z = std::fabs(1.0f - 2.0f * x_1);
-            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
+            float z = std::sqrt(1.0f - x_1);
+            float r = std::sqrt(x_1), phi = 2 * M_PI * x_2;
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
             return toWorld(localRay, N);
+        }
+        case IS_BRDF:
+        {
+            float x_1 = get_random_float(), x_2 = get_random_float();
+            float a = (1-x_1)/(x_1*(alpha*alpha-1)+1);
+            float z = std::sqrt(a);
+            float r = std::sqrt(1-a), phi = 2 * M_PI * x_2;
+            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
+            Vector3f wh = normalize(toWorld(localRay, N));
+            Vector3f wi = normalize(2*dotProduct(wo, wh)*wh-wo);
+            return wi;
         }
         default:
         {
@@ -149,8 +154,8 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
 }
 
 float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
-    switch(m_type){
-        case DIFFUSE:
+    switch(m_sample){
+        case UNIFORM:
         {
             // uniform sample probability 1 / (2 * PI)
             if (dotProduct(wo, N) > 0.0f)
@@ -159,10 +164,28 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
                 return 0.0f;
             break;
         }
-        case MICROFACET:
+        case IS_COSWEIGHTED:
         {
-            if (dotProduct(wo, N) > 0.0f)
-                return 0.5f / M_PI;
+            if (dotProduct(wo, N) > 0.0f){
+                float NdotWi = std::max(dotProduct(wi, N), 0.f);
+                return NdotWi / M_PI;
+            }
+            else
+                return 0.0f;
+            break;
+        }
+        case IS_BRDF:
+        {
+            if (dotProduct(wo, N) > 0.0f){
+                Vector3f wh = (wo + wi).normalized();
+                float Ndoth = std::max(dotProduct(N, wh), 0.f);
+                float hdotwo = std::max(dotProduct(wo, wh), 0.f);
+                float alpha2 = alpha*alpha;
+                float temp = (Ndoth*Ndoth*(alpha2-1.0f)+1);
+                float D = alpha2/(M_PI*temp*temp);
+
+                return Ndoth*D*0.25/hdotwo;
+            }
             else
                 return 0.0f;
             break;
@@ -189,7 +212,8 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
                 return diffuse;
             }
             else
-                return Vector3f(0.0f);
+                // return Vector3f(0.0f);
+                return 0.0f;
             break;
         }
         case MICROFACET:
@@ -201,21 +225,23 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             Vector3f h = (wi + wo).normalized();
             float NdotWi = dotProduct(N, wi);
             float Ndoth = dotProduct(N, h);
-            Vector3f lambert = rho/M_PI;
+            if (NdotWi <= 0.0f || Ndoth <= 0.0f || dotProduct(wi, h) <= 0.0f){
+                return Vector3f(0.0f);
+            }
             
             Vector3f F = F0 + (Vector3f(1.0f)-F0)*pow(1-NdotWo,5);
             
             float k = (alpha+1)*(alpha+1)*0.125f;
-            float G = NdotWo/(NdotWo*(1-k)+k);
+            float G = NdotWo*NdotWi/(NdotWo*(1-k)+k)/(NdotWi*(1-k)+k);
 
             float alpha2 = alpha*alpha;
             float temp = (Ndoth*Ndoth*(alpha2-1.0f)+1);
             float D = alpha2/(M_PI*temp*temp);
 
             Vector3f cook_torrance = F*D*G/(4*NdotWo*NdotWi);
+            Vector3f lambert = rho/M_PI;
 
-            float ks = 0.1f;
-            return ks*lambert + (1-ks)*cook_torrance;
+            return (1-ks)*lambert + ks*cook_torrance;
         }
         default:
         {
