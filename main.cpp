@@ -33,24 +33,28 @@ int main(int argc, char** argv)
     red->F0 = Vector3f(0.21f,0.21f,0.21f);
     red->alpha = 0.1f;
     red->ks = 0.2f;
+    // red->ks = 0.9f;
 
     Material* green = new Material(MICROFACET, Vector3f(0.0f), st);
     green->rho = Vector3f(0.14f, 0.45f, 0.091f);
     green->F0 = Vector3f(0.21f,0.21f,0.21f);
     green->alpha = 0.1f;
-    green->ks = 0.5f;
+    green->ks = 0.2f;
+    // green->ks = 0.9f;
 
     Material* white = new Material(MICROFACET, Vector3f(0.0f), st);
     white->rho = Vector3f(0.725f, 0.71f, 0.68f);
     white->F0 = Vector3f(0.21f,0.21f,0.21f);
     white->alpha = 0.1f;
     white->ks = 0.2f;
+    // white->ks = 0.9f;
 
-    Material* light = new Material(MICROFACET, 2.f*(8.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 15.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 18.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f)), st);
+    Material* light = new Material(MICROFACET, (8.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 15.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 18.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f)), st);
     light->rho = Vector3f(0.65f);
     light->F0 = Vector3f(0.21f,0.21f,0.21f);
     light->alpha = 0.1f;
     light->ks = 0.2f;
+    // light->ks = 0.9f;
 
     Material* iron = new Material(MICROFACET, Vector3f(0.0f), st);
     iron->rho = Vector3f(0.725f, 0.71f, 0.68f);
@@ -63,6 +67,12 @@ int main(int argc, char** argv)
     gold->F0 = Vector3f(1.0f,0.86f,0.57f);
     gold->alpha = 0.1f;
     gold->ks = 0.9f;
+
+    Material* silver = new Material(MICROFACET, Vector3f(0.0f), st);
+    silver->rho = Vector3f(0.725f, 0.71f, 0.68f);
+    silver->F0 = Vector3f(0.98f,0.97f,0.95f);
+    silver->alpha = 0.01f;
+    silver->ks = 0.9f;
 
     Material* plastic = new Material(MICROFACET, Vector3f(0.0f), st);
     plastic->rho = Vector3f(0.725f, 0.71f, 0.68f);
@@ -89,18 +99,19 @@ int main(int argc, char** argv)
     Mesh right("../models/cornellbox/right.obj", green);
     Mesh light_("../models/cornellbox/light.obj", light);
 
-    Mesh bunny("../models/bunny/bunny2.obj", gold);
+    Mesh bunny("../models/bunny/bunny4.obj", gold);
     // Mesh shortbox("../models/cornellbox/shortbox.obj", plastic);
-    // Mesh tallbox("../models/cornellbox/tallbox.obj", gold);
+    Mesh tallbox("../models/cornellbox/tallbox.obj", silver);
 
     scene.Add(&floor);
-    // scene.Add(&shortbox);
-    // scene.Add(&tallbox);
     scene.Add(&left);
     scene.Add(&right);
-    scene.Add(&light_);
 
     scene.Add(&bunny);
+    // scene.Add(&shortbox);
+    scene.Add(&tallbox);
+
+    scene.Add(&light_);
 
     scene.buildBVH();
 

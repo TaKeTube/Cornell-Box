@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.hpp"
+#include "global.hpp"
 
 enum MaterialType {DIFFUSE, MICROFACET};
 enum SamplingType {UNIFORM, IS_COSWEIGHTED, IS_BRDF};
@@ -121,7 +122,7 @@ Vector3f Material::sample(const Vector3f &wo, const Vector3f &N){
             float z = std::fabs(1.0f - 2.0f * x_1);
             float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
-            return toWorld(localRay, N);
+            return toWorld(localRay, N).normalized();
         }
         case IS_COSWEIGHTED:
         {
@@ -129,7 +130,7 @@ Vector3f Material::sample(const Vector3f &wo, const Vector3f &N){
             float z = std::sqrt(1.0f - x_1);
             float r = std::sqrt(x_1), phi = 2 * M_PI * x_2;
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
-            return toWorld(localRay, N);
+            return toWorld(localRay, N).normalized();
         }
         case IS_BRDF:
         {
@@ -148,7 +149,7 @@ Vector3f Material::sample(const Vector3f &wo, const Vector3f &N){
             float z = std::fabs(1.0f - 2.0f * x_1);
             float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
             Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
-            return toWorld(localRay, N);
+            return toWorld(localRay, N).normalized();
         }
     }
 }
@@ -167,8 +168,8 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
         case IS_COSWEIGHTED:
         {
             if (dotProduct(wo, N) > 0.0f){
-                float NdotWi = std::max(dotProduct(wi, N), 0.f);
-                return NdotWi / M_PI;
+                float NdotWo = std::max(dotProduct(wo, N), 0.f);
+                return NdotWo / M_PI;
             }
             else
                 return 0.0f;
@@ -225,7 +226,7 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             Vector3f h = (wi + wo).normalized();
             float NdotWi = dotProduct(N, wi);
             float Ndoth = dotProduct(N, h);
-            if (NdotWi <= 0.0f || Ndoth <= 0.0f || dotProduct(wi, h) <= 0.0f){
+            if (NdotWi <= 0.0f || Ndoth <= 0.0f){
                 return Vector3f(0.0f);
             }
             
@@ -242,6 +243,7 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             Vector3f lambert = rho/M_PI;
 
             return (1-ks)*lambert + ks*cook_torrance;
+            // return (1.f-std::max(std::max(F.x, F.y), F.z))*lambert + cook_torrance;
         }
         default:
         {
